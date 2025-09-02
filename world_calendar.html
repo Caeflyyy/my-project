@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalender Dunia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .world-clock {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+
+        .clock-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .clock-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .city-name {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .country {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .time {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+
+        .date {
+            color: #7f8c8d;
+            font-size: 1rem;
+        }
+
+        .calendar-section {
+            padding: 30px;
+        }
+
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #2980b9;
+            transform: scale(1.1);
+        }
+
+        .current-month {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 250px;
+            text-align: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            padding: 2px;
+            overflow: hidden;
+        }
+
+        .day-header {
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .day-cell {
+            background: white;
+            padding: 15px 10px;
+            text-align: center;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .day-cell:hover {
+            background: #e8f4fd;
+            transform: scale(1.05);
+        }
+
+        .day-number {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .day-cell.other-month {
+            background: #f8f9fa;
+            color: #bdc3c7;
+        }
+
+        .day-cell.today {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+        }
+
+        .day-cell.selected {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .holiday {
+            font-size: 0.7rem;
+            background: #e74c3c;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 6px;
+            margin-top: 2px;
+        }
+
+        .timezone-selector {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 8px;
+            border: 2px solid #bdc3c7;
+            font-size: 1rem;
+            background: white;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .calendar-controls {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .world-clock {
+                grid-template-columns: 1fr;
+            }
+            
+            .day-cell {
+                min-height: 60px;
+                padding: 10px 5px;
+            }
+            
+            .current-month {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Kalender Dunia 🗓️</h1>
+            <p>Waktu dan Tanggal dari Seluruh Dunia</p>
+        </div>
+
+        <div class="world-clock" id="worldClock">
+            <!-- World clocks will be populated by JavaScript -->
+        </div>
+
+        <div class="calendar-section">
+            <div class="calendar-controls">
+                <div class="month-nav">
+                    <button class="nav-btn" onclick="previousMonth()">‹</button>
+                    <div class="current-month" id="currentMonth"></div>
+                    <button class="nav-btn" onclick="nextMonth()">›</button>
+                </div>
+                <div class="timezone-selector">
+                    <label>Zona Waktu:</label>
+                    <select id="timezoneSelect" onchange="updateCalendarTimezone()">
+                        <option value="Asia/Jakarta">WIB (Jakarta)</option>
+                        <option value="Asia/Makassar">WITA (Makassar)</option>
+                        <option value="Asia/Jayapura">WIT (Jayapura)</option>
+                        <option value="UTC">UTC</option>
+                        <option value="America/New_York">EST (New York)</option>
+                        <option value="Europe/London">GMT (London)</option>
+                        <option value="Asia/Tokyo">JST (Tokyo)</option>
+                        <option value="Australia/Sydney">AEDT (Sydney)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="calendar-grid" id="calendarGrid">
+                <!-- Calendar will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentDate = new Date();
+        let selectedDate = null;
+        let currentTimezone = 'Asia/Jakarta';
+
+        const worldCities = [
+            { city: 'Jakarta', country: 'Indonesia', timezone: 'Asia/Jakarta' },
+            { city: 'Tokyo', country: 'Jepang', timezone: 'Asia/Tokyo' },
+            { city: 'London', country: 'Inggris', timezone: 'Europe/London' },
+            { city: 'New York', country: 'Amerika Serikat', timezone: 'America/New_York' },
+            { city: 'Dubai', country: 'UAE', timezone: 'Asia/Dubai' },
+            { city: 'Sydney', country: 'Australia', timezone: 'Australia/Sydney' },
+            { city: 'Berlin', country: 'Jerman', timezone: 'Europe/Berlin' },
+            { city: 'Mumbai', country: 'India', timezone: 'Asia/Kolkata' }
+        ];
+
+        const monthNames = [
+            'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+        ];
+
+        const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+        const holidays = {
+            '2025-01-01': 'Tahun Baru',
+            '2025-02-14': 'Valentine',
+            '2025-08-17': 'Kemerdekaan RI',
+            '2025-12-25': 'Natal'
+        };
+
+        function updateWorldClocks() {
+            const clockContainer = document.getElementById('worldClock');
+            clockContainer.innerHTML = '';
+
+            worldCities.forEach(city => {
+                const now = new Date();
+                const cityTime = new Date(now.toLocaleString("en-US", {timeZone: city.timezone}));
+                
+                const clockCard = document.createElement('div');
+                clockCard.className = 'clock-card';
+                
+                clockCard.innerHTML = `
+                    <div class="city-name">${city.city}</div>
+                    <div class="country">${city.country}</div>
+                    <div class="time">${cityTime.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit', second: '2-digit'})}</div>
+                    <div class="date">${cityTime.toLocaleDateString('id-ID', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'})}</div>
+                `;
+                
+                clockContainer.appendChild(clockCard);
+            });
+        }
+
+        function updateCalendar() {
+            const year = currentDate.getFullYear();
+            const month = currentDate.getMonth();
+            
+            document.getElementById('currentMonth').textContent = `${monthNames[month]} ${year}`;
+            
+            const calendarGrid = document.getElementById('calendarGrid');
+            calendarGrid.innerHTML = '';
+            
+            // Add day headers
+            dayNames.forEach(day => {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                dayHeader.textContent = day;
+                calendarGrid.appendChild(dayHeader);
+            });
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const daysInPrevMonth = new Date(year, month, 0).getDate();
+            
+            // Previous month's trailing days
+            for (let i = firstDay - 1; i >= 0; i--) {
+                const dayCell = createDayCell(daysInPrevMonth - i, true);
+                calendarGrid.appendChild(dayCell);
+            }
+            
+            // Current month days
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayCell = createDayCell(day, false);
+                calendarGrid.appendChild(dayCell);
+            }
+            
+            // Next month's leading days
+            const cellsUsed = firstDay + daysInMonth;
+            const cellsNeeded = Math.ceil(cellsUsed / 7) * 7;
+            for (let day = 1; day <= cellsNeeded - cellsUsed; day++) {
+                const dayCell = createDayCell(day, true);
+                calendarGrid.appendChild(dayCell);
+            }
+        }
+
+        function createDayCell(day, isOtherMonth) {
+            const dayCell = document.createElement('div');
+            dayCell.className = 'day-cell';
+            
+            if (isOtherMonth) {
+                dayCell.classList.add('other-month');
+            }
+            
+            const today = new Date();
+            const cellDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            
+            if (!isOtherMonth && 
+                day === today.getDate() && 
+                currentDate.getMonth() === today.getMonth() && 
+                currentDate.getFullYear() === today.getFullYear()) {
+                dayCell.classList.add('today');
+            }
+            
+            if (selectedDate && 
+                !isOtherMonth &&
+                day === selectedDate.getDate() &&
+                currentDate.getMonth() === selectedDate.getMonth() &&
+                currentDate.getFullYear() === selectedDate.getFullYear()) {
+                dayCell.classList.add('selected');
+            }
+            
+            dayCell.innerHTML = `<div class="day-number">${day}</div>`;
+            
+            // Add holiday if exists
+            if (!isOtherMonth) {
+                const dateKey = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                if (holidays[dateKey]) {
+                    const holiday = document.createElement('div');
+                    holiday.className = 'holiday';
+                    holiday.textContent = holidays[dateKey];
+                    dayCell.appendChild(holiday);
+                }
+            }
+            
+            dayCell.onclick = () => {
+                if (!isOtherMonth) {
+                    selectedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+                    updateCalendar();
+                }
+            };
+            
+            return dayCell;
+        }
+
+        function previousMonth() {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            updateCalendar();
+        }
+
+        function nextMonth() {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            updateCalendar();
+        }
+
+        function updateCalendarTimezone() {
+            currentTimezone = document.getElementById('timezoneSelect').value;
+            updateCalendar();
+        }
+
+        // Initialize
+        updateWorldClocks();
+        updateCalendar();
+        
+        // Update world clocks every second
+        setInterval(updateWorldClocks, 1000);
+    </script>
+</body>
+</html>
